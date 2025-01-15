@@ -5,25 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #product {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid;
+            border-radius: 10px;
+        }
+        #product img {
+            max-width: 200px;
+            border-radius: 10px;
+        }
+        #buy-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #buy-button:hover {
+            background-color: #005f99;
+        }
+    </style>
 </head>
 <body>
-    <h1>Привіт, користувач! <br> хулі ти тут лазиш :)</h1>
+    <h1 id="greeting">Привіт, користувач!</h1>
     <button id="send-data">Надіслати дані</button>
 
+    <div id="product">
+        <img src="https://via.placeholder.com/200" alt="Товар">
+        <h2 id="product-name">Супер Гаджет</h2>
+        <p id="product-description">Це чудовий гаджет, який змінить твоє життя!</p>
+        <button id="buy-button">Купити</button>
+    </div>
+
     <script>
-        // Ініціалізація Web App
         const tg = window.Telegram.WebApp;
 
-        // Встановлення теми інтерфейсу
-        document.body.style.backgroundColor = tg.themeParams.bg_color;
+        // Перемикання кольорової гами
+        function applyTheme() {
+            const themeParams = tg.themeParams;
+            document.body.style.backgroundColor = themeParams.bg_color || '#ffffff';
+            document.body.style.color = themeParams.text_color || '#000000';
+            document.getElementById('product').style.borderColor = themeParams.hint_color || '#cccccc';
+        }
+
+        // Ініціалізація теми та відображення
+        tg.onEvent('themeChanged', applyTheme);
+        applyTheme();
+
+        // Динамічне вітання
+        const user = tg.initDataUnsafe.user;
+        const greeting = document.getElementById('greeting');
+        if (user && user.first_name) {
+            greeting.textContent = `Здарова, ${user.first_name}! Давай дєньги на карту:`;
+        }
 
         // Надсилання даних назад до Telegram
         document.getElementById('send-data').addEventListener('click', () => {
-            tg.sendData(JSON.stringify({ message: "Hello from Web App!" }));
+            tg.sendData(JSON.stringify({ message: "Користувач хоче надіслати гроші!" }));
         });
 
-        // Відображення даних про користувача
-        console.log("User:", tg.initDataUnsafe.user);
+        // Симуляція покупки товару
+         document.getElementById('buy-button').addEventListener('click', () => {
+            alert('Не спіши галава, товар на склад ще не завезли');
+        });
     </script>
 </body>
 </html>
