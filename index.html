@@ -14,20 +14,25 @@
             text-align: center;
             transition: background-color 0.3s, color 0.3s;
         }
-        #product {
+        #product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 20px;
             padding: 15px;
             border: 1px solid;
             border-radius: 10px;
         }
-        #product img {
-            max-width: 200px;
+        .product img {
+            max-width: 150px;
             border-radius: 10px;
         }
-        #buy-button {
+        .buy-button {
             margin-top: 10px;
             padding: 10px 20px;
             background-color: #0088cc;
@@ -36,18 +41,14 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        #buy-button:hover {
+        .buy-button:hover {
             background-color: #005f99;
         }
     </style>
 </head>
 <body>
-    <div id="product">
-        <img src="https://http.cat/images/100.jpg" alt="Товар">
-        <h2 id="product-name">Супер Гаджет</h2>
-        <p id="product-description">Це чудовий гаджет, який змінить твоє життя!</p>
-        <button id="buy-button">Купити</button>
-    </div>
+    <h1 id="greeting">Здарова, користувач!</h1>
+    <div id="product-grid"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -57,29 +58,43 @@
             const themeParams = tg.themeParams;
             document.body.style.backgroundColor = themeParams.bg_color || '#ffffff';
             document.body.style.color = themeParams.text_color || '#000000';
-            document.getElementById('product').style.borderColor = themeParams.hint_color || '#cccccc';
         }
 
-        // Ініціалізація теми та відображення
         tg.onEvent('themeChanged', applyTheme);
         applyTheme();
 
         // Динамічне вітання
         const user = tg.initDataUnsafe.user;
-        const greeting = document.getElementById('greeting');
         if (user && user.first_name) {
-            greeting.textContent = `Здарова, ${user.first_name}! Шо ти галава?)`;
+            document.getElementById('greeting').textContent = `Здарова, ${user.first_name}! Шо ти галава?)`;
         }
 
-        // Надсилання даних назад до Telegram
-        document.getElementById('send-data').addEventListener('click', () => {
-            tg.sendData(JSON.stringify({ message: "Користувач хоче надіслати гроші!" }));
-        });
+        // Отримання даних з URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productsJson = urlParams.get('products');
 
-        // Симуляція покупки товару
-         document.getElementById('buy-button').addEventListener('click', () => {
-            alert('Не спіши галава, товар на склад ще не завезли');
-        });
+        if (productsJson) {
+            const products = JSON.parse(decodeURIComponent(productsJson));
+            const productGrid = document.getElementById('product-grid');
+
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'product';
+                productElement.innerHTML = `
+                    <img src="${product.imageUrl}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p><strong>${product.price} грн</strong></p>
+                    <button class="buy-button">Купити</button>
+                `;
+                productElement.querySelector('.buy-button').addEventListener('click', () => {
+                    alert('Не спіши галава, товар на склад ще не завезли');
+                });
+                productGrid.appendChild(productElement);
+            });
+        } else {
+            console.error('Продукти не знайдені в URL!');
+        }
     </script>
 </body>
 </html>
