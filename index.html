@@ -66,7 +66,7 @@
         // Динамічне вітання
         const user = tg.initDataUnsafe.user;
         if (user && user.first_name) {
-            document.getElementById('greeting').textContent = `Здарова, ${user.first_name}! Шо ти галава?)`;
+            document.getElementById('greeting').textContent = `Шалом, ${user.first_name}! Готов платить гроші?)`;
         }
 
         // Отримання даних з URL
@@ -88,7 +88,7 @@
                     <button class="buy-button">Купити</button>
                 `;
                 productElement.querySelector('.buy-button').addEventListener('click', () => {
-                    alert('Не спіши галава, товар на склад ще не завезли');
+                    alert('Та яке купляти, товар на склад ще не завезли');
                 });
                 productGrid.appendChild(productElement);
             });
