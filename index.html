@@ -12,7 +12,7 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            transition: background-color 0.3s, color 0.3s;
+             background: var(--tg-theme-bg-color);
         }
         #product-grid {
             display: grid;
@@ -21,6 +21,7 @@
             margin-top: 20px;
         }
         #greeting{
+           color: var(--tg-theme-button-text-color);
            margin: auto;
         }
         .product {
@@ -43,9 +44,10 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            background: var(--tg-theme-button-color);
         }
         .buy-button:hover {
-            background-color: #005f99;
+            background: var(--tg-theme-button-color);
         }
     </style>
 </head>
@@ -54,50 +56,67 @@
     <div id="product-grid"></div>
 
     <script>
-        const tg = window.Telegram.WebApp;
+    const tg = window.Telegram.WebApp;
 
-        // Перемикання кольорової гами
-        function applyTheme() {
-            const themeParams = tg.themeParams;
-            document.body.style.backgroundColor = themeParams.bg_color || '#ffffff';
-            document.body.style.color = themeParams.text_color || '#000000';
-        }
+    // Перемикання кольорової гами
+    function applyTheme() {
+        const themeParams = tg.themeParams;
+        document.body.style.backgroundColor = themeParams.bg_color || '#ffffff';
+        document.body.style.color = themeParams.text_color || '#000000';
+    }
 
-        tg.onEvent('themeChanged', applyTheme);
-        applyTheme();
+    tg.onEvent('themeChanged', applyTheme);
+    applyTheme();
 
-        // Динамічне вітання
-        const user = tg.initDataUnsafe.user;
-        if (user && user.first_name) {
-            document.getElementById('greeting').textContent = `Шалом, ${user.first_name}! Готов платить гроші?)`;
-        }
+    // Динамічне вітання
+    const user = tg.initDataUnsafe.user;
+    if (user && user.first_name) {
+        document.getElementById('greeting').textContent = `Шалом, ${user.first_name}! Готов платить гроші?)`;
+    }
 
-        // Отримання даних з URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const productsJson = urlParams.get('products');
+    // Функція для відображення продуктів
+    function displayProducts(products) {
+        const productGrid = document.getElementById('product-grid');
+        productGrid.innerHTML = '';
 
-        if (productsJson) {
-            const products = JSON.parse(decodeURIComponent(productsJson));
-            const productGrid = document.getElementById('product-grid');
-
-            products.forEach(product => {
-                const productElement = document.createElement('div');
-                productElement.className = 'product';
-                productElement.innerHTML = `
-                    <img src="${product.imageUrl}" alt="${product.name}">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <p><strong>${product.price} грн</strong></p>
-                    <button class="buy-button">Купити</button>
-                `;
-                productElement.querySelector('.buy-button').addEventListener('click', () => {
-                    alert('Та яке купляти, товар на склад ще не завезли');
-                });
-                productGrid.appendChild(productElement);
+        products.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'product';
+            productElement.innerHTML = `
+                <img src="${product.imageUrl}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <p><strong>${product.price} грн</strong></p>
+                <button class="buy-button">Купити</button>
+            `;
+            productElement.querySelector('.buy-button').addEventListener('click', () => {
+                alert('Та яке купляти, товар на склад ще не завезли');
             });
-        } else {
-            console.error('Продукти не знайдені в URL!');
+            productGrid.appendChild(productElement);
+        });
+    }
+
+    // Отримання даних із сервера
+    fetch('https://b64e-94-247-231-71.ngrok-free.app/api/getProducts', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    </script>
+        return response.json();
+    })
+    .then(data => {
+        console.log('Products:', data);
+        displayProducts(data);
+    })
+    .catch(error => {
+        console.error('Error fetching products:', error);
+        document.getElementById('product-grid').innerHTML = '<p>Не вдалося завантажити товари. Спробуйте пізніше.</p>';
+    });
+</script>
 </body>
 </html>
