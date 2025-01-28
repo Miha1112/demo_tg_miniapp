@@ -91,25 +91,31 @@
         `;
 
         productElement.querySelector('.download-button').addEventListener('click', () => {
-            const downloadUrl = `https://b64e-94-247-231-71.ngrok-free.app/api/download?path=${encodeURIComponent(product.path)}`;
+            const downloadUrl = `https://your-server-address/api/download?path=${encodeURIComponent(product.path)}`;
             fetch(downloadUrl, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
             })
             .then(response => {
                 if (response.ok) {
-                    return response.blob(); // Отримуємо файл у вигляді Blob
+                    // Зчитуємо назву файлу з заголовка Content-Disposition
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    let fileName = 'downloaded-file';
+                    if (contentDisposition && contentDisposition.includes('filename=')) {
+                        fileName = contentDisposition
+                            .split('filename=')[1]
+                            .split(';')[0]
+                            .replace(/"/g, ''); // Видаляємо лапки, якщо є
+                    }
+                    return response.blob().then(blob => ({ blob, fileName }));
                 } else {
                     throw new Error('Не вдалося завантажити файл.');
                 }
             })
-            .then(blob => {
+            .then(({ blob, fileName }) => {
                 const downloadLink = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 downloadLink.href = url;
-                downloadLink.download = product.name; // Назва файлу для збереження
+                downloadLink.download = fileName; // Встановлюємо коректне ім'я файлу
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
@@ -124,6 +130,7 @@
         productGrid.appendChild(productElement);
     });
 }
+
 
 
     // Отримання даних із сервера
