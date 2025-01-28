@@ -76,25 +76,55 @@
 
     // Функція для відображення продуктів
     function displayProducts(products) {
-        const productGrid = document.getElementById('product-grid');
-        productGrid.innerHTML = '';
+    const productGrid = document.getElementById('product-grid');
+    productGrid.innerHTML = '';
 
-        products.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.className = 'product';
-            productElement.innerHTML = `
-                <img src="${product.imageUrl}" alt="${product.name}">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <p><strong>${product.price} грн</strong></p>
-                <button class="buy-button">Купити</button>
-            `;
-            productElement.querySelector('.buy-button').addEventListener('click', () => {
-                alert('Та яке купляти, товар на склад ще не завезли');
+    products.forEach(product => {
+        const productElement = document.createElement('div');
+        productElement.className = 'product';
+        productElement.innerHTML = `
+            <img src="${product.imageUrl}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <p><strong>${product.price} грн</strong></p>
+            <button class="download-button">Завантажити</button>
+        `;
+
+        productElement.querySelector('.download-button').addEventListener('click', () => {
+            const downloadUrl = `https://b64e-94-247-231-71.ngrok-free.app/api/download?path=${encodeURIComponent(product.path)}`;
+            fetch(downloadUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob(); // Отримуємо файл у вигляді Blob
+                } else {
+                    throw new Error('Не вдалося завантажити файл.');
+                }
+            })
+            .then(blob => {
+                const downloadLink = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = product.name; // Назва файлу для збереження
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Сталася помилка при завантаженні файлу.');
             });
-            productGrid.appendChild(productElement);
         });
-    }
+
+        productGrid.appendChild(productElement);
+    });
+}
+
 
     // Отримання даних із сервера
     fetch('https://b64e-94-247-231-71.ngrok-free.app/api/getProducts', {
