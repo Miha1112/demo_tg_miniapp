@@ -91,7 +91,7 @@
         `;
 
         productElement.querySelector('.download-button').addEventListener('click', () => {
-            const downloadUrl = `https://your-server-address/api/download?path=${encodeURIComponent(product.path)}`;
+            const downloadUrl = `https://b64e-94-247-231-71.ngrok-free.app/api/download?path=${encodeURIComponent(product.path)}`;
             fetch(downloadUrl, {
                 method: 'GET',
             })
