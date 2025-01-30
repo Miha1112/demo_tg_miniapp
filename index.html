@@ -85,7 +85,7 @@
         `;
 
         productElement.querySelector('.download-button').addEventListener('click', () => {
-            tg.openLink(`https://b64e-94-247-231-71.ngrok-free.app/api/download?path=${encodeURIComponent(product.path)}`);
+            tg.openLink(`https://8b5b-94-247-231-71.ngrok-free.app/api/download?path=${encodeURIComponent(product.path)}`);
         });
 
         productGrid.appendChild(productElement);
@@ -95,7 +95,7 @@
 
 
     // Отримання даних із сервера
-    fetch('https://b64e-94-247-231-71.ngrok-free.app/api/getProducts', {
+    fetch('https://8b5b-94-247-231-71.ngrok-free.app/api/getProducts', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
