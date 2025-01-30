@@ -28,25 +28,31 @@
             border-radius: 10px;
             background: var(--tg-theme-secondary-bg-color);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, max-height 0.3s;
-            overflow: hidden;
-            max-height: 150px;
+            cursor: pointer;
         }
         .product img {
             max-width: 100%;
             border-radius: 10px;
         }
-        .product h3, .product p, .buy-button {
+        #product-modal {
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--tg-theme-bg-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
         }
-        .product.expanded {
-            transform: scale(1.1);
-            max-height: 300px;
+        #product-modal img {
+            max-width: 100%;
+            border-radius: 10px;
         }
-        .product.expanded h3, .product.expanded p, .product.expanded .buy-button {
-            display: block;
-        }
-        .buy-button {
+        .close-button {
             margin-top: 10px;
             padding: 10px 20px;
             background-color: var(--tg-theme-button-color);
@@ -55,17 +61,8 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .buy-button:hover {
+        .close-button:hover {
             opacity: 0.8;
-        }
-        #notification {
-            display: none;
-            position: fixed;
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         @media (min-width: 600px) {
             #product-grid {
@@ -82,7 +79,14 @@
 <body>
     <h1 id="greeting">Demo mini app</h1>
     <div id="product-grid"></div>
-    <div id="notification">Товар додано до кошика!</div>
+    
+    <div id="product-modal">
+        <img id="modal-image" src="" alt="">
+        <h3 id="modal-title"></h3>
+        <p id="modal-description"></p>
+        <p><strong id="modal-price"></strong></p>
+        <button class="close-button" onclick="closeModal()">Закрити</button>
+    </div>
 
     <script>
     const tg = window.Telegram.WebApp;
@@ -97,14 +101,16 @@
     tg.onEvent('themeChanged', applyTheme);
     applyTheme();
 
-    function showNotification() {
-        const notification = document.getElementById('notification');
-        notification.style.display = 'block';
-        notification.style.bottom = (window.innerHeight * 0.1 || 20) + 'px';
-        notification.style.left = ((window.innerWidth - notification.offsetWidth) / 2 || 0) + 'px';
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 2000);
+    function openModal(product) {
+        document.getElementById('modal-image').src = product.imageUrl;
+        document.getElementById('modal-title').textContent = product.name;
+        document.getElementById('modal-description').textContent = product.description;
+        document.getElementById('modal-price').textContent = product.price + ' $';
+        document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('product-modal').style.display = 'none';
     }
 
     function displayProducts(products) {
@@ -116,19 +122,8 @@
             productElement.className = 'product';
             productElement.innerHTML = `
                 <img src="${product.imageUrl}" alt="${product.name}">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <p><strong>${product.price} грн</strong></p>
-                <button class="buy-button">Купити</button>
             `;
-            productElement.addEventListener('click', () => {
-                productElement.classList.toggle('expanded');
-            });
-            productElement.querySelector('.buy-button').addEventListener('click', (event) => {
-                event.stopPropagation();
-                showNotification();
-            });
-
+            productElement.addEventListener('click', () => openModal(product));
             productGrid.appendChild(productElement);
         });
     }
