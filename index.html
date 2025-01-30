@@ -6,6 +6,26 @@
     <title>Telegram Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        #cart-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 128, 0, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        #cart-message.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -90,7 +110,8 @@
 </head>
 <body>
     <h1 id="greeting">Demo mini app</h1>
-    <div id="product-grid"></div>
+    <div id="product-grid"></div>    
+    <div id="cart-message">Товар додано до кошика</div>
     
     <div id="product-modal">
         <img id="modal-image" src="" alt="">
@@ -129,7 +150,13 @@
     }
 
     function buyProduct() {
-        alert('Товар додано до кошика!');
+        const notification = document.getElementById('notification');
+        notification.style.display = 'block';
+        notification.style.bottom = (window.innerHeight * 0.1 || 20) + 'px';
+        notification.style.left = ((window.innerWidth - notification.offsetWidth) / 2 || 0) + 'px';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 2000);
     }
 
     function displayProducts(products) {
@@ -145,6 +172,14 @@
             productElement.addEventListener('click', () => openModal(product));
             productGrid.appendChild(productElement);
         });
+    }
+
+    function showCartMessage() {
+        const cartMessage = document.getElementById('cart-message');
+        cartMessage.classList.add('show');
+        setTimeout(() => {
+            cartMessage.classList.remove('show');
+        }, 2000);
     }
 
     fetch('https://8b5b-94-247-231-71.ngrok-free.app/api/getProducts', {
