@@ -52,16 +52,28 @@
             max-width: 100%;
             border-radius: 10px;
         }
-        .close-button {
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
             margin-top: 10px;
+        }
+        .close-button {
             padding: 10px 20px;
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
+            background-color: gray;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .close-button:hover {
+        .buy-button {
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .close-button:hover, .buy-button:hover {
             opacity: 0.8;
         }
         @media (min-width: 600px) {
@@ -85,7 +97,10 @@
         <h3 id="modal-title"></h3>
         <p id="modal-description"></p>
         <p><strong id="modal-price"></strong></p>
-        <button class="close-button" onclick="closeModal()">Закрити</button>
+        <div class="modal-buttons">
+            <button class="close-button" onclick="closeModal()">Закрити</button>
+            <button class="buy-button" onclick="buyProduct()">Купити</button>
+        </div>
     </div>
 
     <script>
@@ -111,6 +126,10 @@
 
     function closeModal() {
         document.getElementById('product-modal').style.display = 'none';
+    }
+
+    function buyProduct() {
+        alert('Товар додано до кошика!');
     }
 
     function displayProducts(products) {
